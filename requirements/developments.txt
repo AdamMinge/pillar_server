@@ -1,0 +1,9 @@
+black>=23.1.0,<23.2
+django-stubs>=1.16.0,<1.17
+djangorestframework-stubs>=1.10.0,<1.11
+pylint>=2.17.1,<2.18
+pydocstyle>=6.3.0,<6.4
+pycodestyle>=2.10.0,<2.11
+flake8>=6.0.0,<6.1
+bandit>=1.7.5,<1.8
+pytest-django>=4.5.2,<4.6

@@ -1,0 +1,39 @@
+{
+	"name": "Existing Docker Compose (Extend)",
+	"dockerComposeFile": [
+		"../docker-compose.debug.yml",
+		"docker-compose.yml"
+	],
+	"service": "app",
+	"workspaceFolder": "/workspace",
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"editor.defaultFormatter": "ms-python.python",
+				"python.formatting.provider": "black",
+				"python.pythonPath": "/usr/local/bin/python",
+				"python.linting.enabled": true,
+				"python.linting.pylintEnabled": true,
+				"python.linting.banditPath": "/usr/local/bin/bandit",
+				"python.linting.flake8Path": "/usr/local/bin/flake8",
+				"python.linting.pycodestylePath": "/usr/local/bin/pycodestyle",
+				"python.linting.pydocstylePath": "/usr/local/bin/pydocstyle",
+				"python.linting.pylintPath": "/usr/local/bin/pylint",
+				"python.linting.pylintArgs": [
+					"--disable=missing-class-docstring",
+					"--disable=missing-function-docstring",
+					"--disable=missing-module-docstring",
+					"--disable=too-few-public-methods",
+					"--disable=too-many-ancestors",
+					"--disable=arguments-differ",
+					"--disable=no-member"
+				]
+			},
+			"extensions": [
+				"ms-python.python",
+				"ms-python.black-formatter",
+				"DanielSanMedium.dscodegpt"
+			]
+		}
+	}
+}
