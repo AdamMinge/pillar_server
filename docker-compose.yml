@@ -18,7 +18,7 @@ services:
       - DJANGO_SUPERUSER_EMAIL=admin@gmail.com
 
       - REDIS_HOST=redis://redis:6379/1
-      - REDIS_KEY_PREFIX=egnite
+      - REDIS_KEY_PREFIX=flow
 
       - DATABASE_NAME=db
       - DATABASE_USER=${DATABASE_USER}
