@@ -25,7 +25,7 @@ from authentication.swagger import (
     extend_refresh_token_schema,
     extend_verify_token_schema,
     extend_blacklist_token_schema,
-    extend_register_schema,
+    extend_signup_schema,
     extend_verify_activation_email_token_schema,
     extend_send_activation_email_token_schema,
     extend_user_list_schema,
@@ -53,8 +53,8 @@ class BlacklistTokenView(AccessPolicyViewSetMixin, TokenBlacklistView):
     access_policy = OrganizationAPIKeyAccessPolicy
 
 
-@extend_register_schema
-class RegisterView(AccessPolicyViewSetMixin, generics.CreateAPIView):
+@extend_signup_schema
+class SignupView(AccessPolicyViewSetMixin, generics.CreateAPIView):
     serializer_class = UserSerializer
     access_policy = OrganizationAPIKeyAccessPolicy
 

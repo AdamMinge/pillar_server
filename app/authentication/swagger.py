@@ -54,9 +54,9 @@ extend_blacklist_token_schema = extend_schema_view(
     )
 )
 
-extend_register_schema = extend_schema_view(
+extend_signup_schema = extend_schema_view(
     post=extend_schema(
-        description=_("Register"), responses={status.HTTP_201_CREATED: UserSerializer}
+        description=_("Signup"), responses={status.HTTP_201_CREATED: UserSerializer}
     )
 )
 

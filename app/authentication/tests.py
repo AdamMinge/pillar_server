@@ -102,12 +102,12 @@ class LoginTestCase(GenericTestCase):
 
 
 @attach_api_key_credentials()
-class RegisterTestCase(GenericTestCase):
+class SignupTestCase(GenericTestCase):
     def setUp(self):
-        self.url = reverse("register", kwargs={"version": "v1"})
+        self.url = reverse("signup", kwargs={"version": "v1"})
         self.user = UserFactory.create()
 
-    def test_register_success(self):
+    def test_signup_success(self):
         data = {
             "email": "new_user@example.com",
             "username": "new_user",
@@ -127,7 +127,7 @@ class RegisterTestCase(GenericTestCase):
         self.assertEqual(response.data["email"], data["email"])
         self.assertEqual(response.data["username"], data["username"])
 
-    def test_register_invalid_password(self):
+    def test_signup_invalid_password(self):
         data = {
             "email": "new_user@example.com",
             "username": "new_user",
@@ -137,7 +137,7 @@ class RegisterTestCase(GenericTestCase):
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_register_email_already_exists(self):
+    def test_signup_email_already_exists(self):
         data = {
             "email": f"{self.user.email}",
             "username": "new_user",
@@ -148,7 +148,7 @@ class RegisterTestCase(GenericTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("email", response.data)
 
-    def test_register_username_already_exists(self):
+    def test_signup_username_already_exists(self):
         data = {
             "email": "new_user@example.com",
             "username": f"{self.user.username}",
