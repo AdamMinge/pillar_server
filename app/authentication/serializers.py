@@ -51,9 +51,15 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             "updated": {"source": "updated_at"},
         }
 
-    def save(self, **kwargs):
-        user = super().save(**kwargs)
+    def create(self, validated_data):
+        password = validated_data.pop("password", None)
+        assert password is not None
+
+        user = super().create(validated_data)
         assert user is not None
+    
+        user.set_password(password)
+        user.save()
 
         token, _ = _token_generator.make_token(user)
         _token_sender.send(user, token)
