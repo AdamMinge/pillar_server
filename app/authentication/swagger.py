@@ -43,14 +43,15 @@ extend_refresh_token_schema = extend_schema_view(
 
 extend_verify_token_schema = extend_schema_view(
     post=extend_schema(
-        description=_("Verify Token"), responses={status.HTTP_200_OK: OpenApiResponse()}
+        description=_("Verify Token"),
+        responses={status.HTTP_204_NO_CONTENT: OpenApiResponse()},
     )
 )
 
 extend_blacklist_token_schema = extend_schema_view(
     post=extend_schema(
         description=_("Blacklist Token"),
-        responses={status.HTTP_200_OK: OpenApiResponse()},
+        responses={status.HTTP_204_NO_CONTENT: OpenApiResponse()},
     )
 )
 
@@ -63,14 +64,28 @@ extend_signup_schema = extend_schema_view(
 extend_verify_activation_email_token_schema = extend_schema_view(
     post=extend_schema(
         description=_("Verify Activation Email Token"),
-        responses={status.HTTP_200_OK: OpenApiResponse()},
+        responses={status.HTTP_204_NO_CONTENT: OpenApiResponse()},
+    )
+)
+
+extend_verify_password_recovery_token_schema = extend_schema_view(
+    post=extend_schema(
+        description=_("Verify Password Recovery Token"),
+        responses={status.HTTP_204_NO_CONTENT: OpenApiResponse()},
     )
 )
 
 extend_send_activation_email_token_schema = extend_schema_view(
     post=extend_schema(
         description=_("Send Activation Email Token"),
-        responses={status.HTTP_200_OK: OpenApiResponse()},
+        responses={status.HTTP_204_NO_CONTENT: OpenApiResponse()},
+    )
+)
+
+extend_send_password_recovery_token_schema = extend_schema_view(
+    post=extend_schema(
+        description=_("Send Password Recovery Token"),
+        responses={status.HTTP_204_NO_CONTENT: OpenApiResponse()},
     )
 )
 

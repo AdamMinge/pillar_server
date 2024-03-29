@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 
-from rest_framework import status, generics
+from rest_framework import status, generics, views
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -18,7 +18,9 @@ from authentication.policies import OrganizationAPIKeyAccessPolicy, UserAccessPo
 from authentication.serializers import (
     UserSerializer,
     SendActivationEmailTokenSerializer,
+    SendRecoveryPasswordTokenSerializer,
     VerifyActivationEmailTokenSerializer,
+    VerifyPasswordRecoveryTokenSerializer,
 )
 from authentication.swagger import (
     extend_obtain_token_pair_schema,
@@ -27,7 +29,9 @@ from authentication.swagger import (
     extend_blacklist_token_schema,
     extend_signup_schema,
     extend_verify_activation_email_token_schema,
+    extend_verify_password_recovery_token_schema,
     extend_send_activation_email_token_schema,
+    extend_send_password_recovery_token_schema,
     extend_user_list_schema,
     extend_user_detail_schema,
 )
@@ -60,15 +64,29 @@ class SignupView(AccessPolicyViewSetMixin, generics.CreateAPIView):
 
 
 @extend_verify_activation_email_token_schema
-class VerifyActivationEmailTokenView(AccessPolicyViewSetMixin, generics.GenericAPIView):
-    serializer_class = VerifyActivationEmailTokenSerializer
+class VerifyActivationEmailTokenView(AccessPolicyViewSetMixin, views.APIView):
+    serializer_class = None
     access_policy = OrganizationAPIKeyAccessPolicy
 
-    def post(self, request: Request, *_args, **_kwargs):
-        serializer = self.serializer_class(data=request.data)
+    def post(self, request: Request, token, *_args, **_kwargs):
+        serializer = VerifyActivationEmailTokenSerializer(context={"token": token})
         serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@extend_verify_password_recovery_token_schema
+class VerifyPasswordRecoveryTokenView(AccessPolicyViewSetMixin, views.APIView):
+    serializer_class = VerifyPasswordRecoveryTokenSerializer
+    access_policy = OrganizationAPIKeyAccessPolicy
+
+    def post(self, request: Request, token, *_args, **_kwargs):
+        serializer = self.serializer_class(data=request.data, context={"token": token})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @extend_send_activation_email_token_schema
@@ -79,8 +97,22 @@ class SendActivationEmailTokenView(AccessPolicyViewSetMixin, generics.GenericAPI
     def post(self, request: Request, *_args, **_kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@extend_send_password_recovery_token_schema
+class SendPasswordRecoveryTokenView(AccessPolicyViewSetMixin, generics.GenericAPIView):
+    serializer_class = SendRecoveryPasswordTokenSerializer
+    access_policy = OrganizationAPIKeyAccessPolicy
+
+    def post(self, request: Request, *_args, **_kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @extend_user_list_schema

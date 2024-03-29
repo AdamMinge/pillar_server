@@ -1,38 +1,33 @@
-import datetime
 import threading
+import datetime
 import jwt
 
 from django.core.mail import EmailMultiAlternatives
 from django.template import Template, Context
 from django.template.loader import render_to_string
 from django.contrib.auth import get_user_model
-from django.conf import settings
+from urllib.parse import urljoin
+
+from .settings import api_settings
 
 
-class EmailVerificationTokenSender:
-    subject = getattr(
-        settings, "VERIFICATION_EMAIL_SUBJECT", "Confirm your email {{ user.username }}"
-    )
-    plain = getattr(settings, "VERIFICATION_EMAIL_PLAIN", "verification_mail.txt")
-    html = getattr(settings, "VERIFICATION_EMAIL_HTML", "verification_mail.html")
-    sender = settings.EMAIL_HOST_USER
-    verification_url = getattr(settings, "VERIFICATION_EMAIL_VERIFICATION_URL", None)
-    logo_url = getattr(settings, "VERIFICATION_EMAIL_LOGO_URL", None)
-    signature = getattr(settings, "VERIFICATION_EMAIL_SIGNATURE", None)
+class AccountVerificationSender:
+    sender = api_settings.EMAIL_SENDER
+    logo = api_settings.EMAIL_LOGO
+    signature = api_settings.EMAIL_SIGNATURE
+    subject = api_settings.EMAIL_ACCOUNT_VERIFICATION_SUBJECT
+    plain = api_settings.EMAIL_ACCOUNT_VERIFICATION_PLAIN
+    html = api_settings.EMAIL_ACCOUNT_VERIFICATION_HTML
 
-    def send(self, user, token: str, thread=True):
+    def send(self, user, url, token, thread=True):
         if thread:
-            thr = threading.Thread(target=self._send, args=(user, token))
+            thr = threading.Thread(target=self._send, args=(user, url, token))
             thr.start()
         else:
-            self._send(user, token)
+            self._send(user, url, token)
 
-    def _send(self, user, token: str):
-        context = {
-            "verification_url": f"{self.verification_url}/{token}",
-            "logo_url": self.logo_url,
-            "signature": self.signature,
-        }
+    def _send(self, user, url, token):
+        context = self.create_context(user, url, token)
 
         subject = Template(self.subject).render(Context(context))
         text = render_to_string(self.plain, context)
@@ -42,11 +37,53 @@ class EmailVerificationTokenSender:
         msg.attach_alternative(html, "text/html")
         msg.send()
 
+    def create_context(self, user, url, token):
+        return {
+            "logo": f"{self.logo}",
+            "signature": f"{self.signature}",
+            "url": urljoin(url, token),
+            "username": f"{user.username}",
+        }
 
-class EmailVerificationTokenGenerator:
-    algorithm = "HS256"
-    secret = settings.SECRET_KEY
-    token_lifetime = datetime.timedelta(days=1)
+
+class PasswordRecoverySender:
+    sender = api_settings.EMAIL_SENDER
+    logo = api_settings.EMAIL_LOGO
+    signature = api_settings.EMAIL_SIGNATURE
+    subject = api_settings.EMAIL_PASSWORD_RECOVERY_SUBJECT
+    plain = api_settings.EMAIL_PASSWORD_RECOVERY_PLAIN
+    html = api_settings.EMAIL_PASSWORD_RECOVERY_HTML
+
+    def send(self, user, url, token, thread=True):
+        if thread:
+            thr = threading.Thread(target=self._send, args=(user, url, token))
+            thr.start()
+        else:
+            self._send(user, url, token)
+
+    def _send(self, user, url, token):
+        context = self.create_context(user, url, token)
+
+        subject = Template(self.subject).render(Context(context))
+        text = render_to_string(self.plain, context)
+        html = render_to_string(self.html, context)
+
+        msg = EmailMultiAlternatives(subject, text, self.sender, [user.email])
+        msg.attach_alternative(html, "text/html")
+        msg.send()
+
+    def create_context(self, user, url, token):
+        return {
+            "logo": f"{self.logo}",
+            "signature": f"{self.signature}",
+            "url": urljoin(url, token),
+            "username": f"{user.username}",
+        }
+
+
+class TokenGenerator:
+    algorithm = api_settings.TOKEN_GENERATOR_ALGORITHM
+    secret = api_settings.TOKEN_GENERATOR_SECRET
 
     def make_token(self, user, **kwargs):
         exp = (datetime.datetime.today() + self.token_lifetime).timestamp()
@@ -79,6 +116,10 @@ class EmailVerificationTokenGenerator:
 
         return True, users[0]
 
-    @staticmethod
-    def now():
-        return datetime.datetime.now().timestamp()
+
+class AccountVerificationTokenGenerator(TokenGenerator):
+    token_lifetime = api_settings.ACCOUNT_VERIFICATION_TOKEN_LIFETIME
+
+
+class PasswordRecoveryTokenGenerator(TokenGenerator):
+    token_lifetime = api_settings.PASSWORD_RECOVERY_TOKEN_LIFETIME
