@@ -195,7 +195,7 @@ class VerifyPasswordRecoveryTokenSerializer(serializers.Serializer):
         password = self.validated_data["password"]
 
         assert user is not None
-        assert user is not None
+        assert password is not None
 
         user.set_password(password)
         user.save()
