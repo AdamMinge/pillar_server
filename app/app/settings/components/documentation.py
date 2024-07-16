@@ -1,5 +1,5 @@
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Flow',
+    'TITLE': 'Pillar',
     'VERSION': '0.0.1',
     'SERVE_INCLUDE_SCHEMA': False,
     'SCHEMA_PATH_PREFIX': '/api/v[0-9]',
